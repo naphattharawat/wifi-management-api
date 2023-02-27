@@ -21,6 +21,7 @@ import loginRoute from './routes/login';
 import requestRoute from './routes/request';
 import memberRoute from './routes/member';
 import basicRoute from './routes/basic';
+import mymophRoute from './routes/mymoph';
 
 // Assign router to the express.Router() instance
 const app: express.Application = express();
@@ -95,10 +96,32 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
     });
 }
 
+let checkAuthMymoph = (req: Request, res: Response, next: NextFunction) => {
+  let token: string = null;
+
+  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
+  } else {
+    token = req.body.token;
+  }
+  if (token == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkZpeCIsImlhdCI6MTUxNjIzOTAyMn0.09pRcgh96xHnYhjNruq6HvUeXQ2SN2V25M-7YVKD-JY') {
+    next();
+  } else {
+    return res.send({
+      ok: false,
+      error: HttpStatus.getStatusText(HttpStatus.UNAUTHORIZED),
+      code: HttpStatus.UNAUTHORIZED
+    });
+  }
+}
+
 app.use('/login', loginRoute);
-app.use('/member', memberRoute);
+app.use('/member',checkAuth, memberRoute);
 app.use('/basic', basicRoute);
 app.use('/api', checkAuth, requestRoute);
+app.use('/mymoph', checkAuthMymoph, mymophRoute);
 app.use('/', indexRoute);
 
 //error handlers
