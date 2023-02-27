@@ -118,7 +118,7 @@ let checkAuthMymoph = (req: Request, res: Response, next: NextFunction) => {
 }
 
 app.use('/login', loginRoute);
-app.use('/member',checkAuth, memberRoute);
+app.use('/member', memberRoute);
 app.use('/basic', basicRoute);
 app.use('/api', checkAuth, requestRoute);
 app.use('/mymoph', checkAuthMymoph, mymophRoute);
