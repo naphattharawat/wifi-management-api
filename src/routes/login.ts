@@ -8,38 +8,45 @@ import * as crypto from 'crypto';
 import { Login } from '../models/login';
 
 import { Jwt } from '../models/jwt';
+import e = require('express');
 
 const loginModel = new Login();
 const jwt = new Jwt();
 
 const router: Router = Router();
 
-router.post('/customer', async (req: Request, res: Response) => {
-  let username: string = req.body.username;
-  let password: string = req.body.password;
-
+router.post('/', async (req: Request, res: Response) => {
+  let code: string = req.body.code;
   let db = req.db;
-
   try {
-    let encPassword = crypto.createHash('md5').update(password).digest('hex');
-    let rs: any = await loginModel.login(db, username, encPassword);
-
-    if (rs.length) {
-
-      let payload = {
-        fullname: `${rs[0].first_name} ${rs[0].last_name}`,
-        id: rs[0].user_id,
+    // let encPassword = crypto.createHash('md5').update(password).digest('hex');
+    let rs: any = await loginModel.login(code);
+    if (rs.access_token) {
+      const info: any = await loginModel.getProfile(rs.access_token);
+      if (info.ok) {
+        // check admin
+        const check = await loginModel.checkDB(db, info.user.CID)
+        if (check.length) {
+          const obj = {
+            cid: info.user.CID,
+            access_token: rs.access_token,
+            refresh_token: rs.refresh_token,
+          }
+          let token = jwt.sign(obj);
+          res.send({ ok: true, token: token });
+        } else {
+          res.send({ ok: false, error: 'Login failed!', code: HttpStatus.UNAUTHORIZED });
+        }
+      } else {
+        res.send({ ok: false, error: 'Login failed!', code: HttpStatus.UNAUTHORIZED });
       }
 
-      let token = jwt.sign(payload);
-      res.send({ ok: true, token: token, code: HttpStatus.OK });
     } else {
       res.send({ ok: false, error: 'Login failed!', code: HttpStatus.UNAUTHORIZED });
     }
   } catch (error) {
     res.send({ ok: false, error: error.message, code: HttpStatus.INTERNAL_SERVER_ERROR });
   }
-
 });
 
 export default router;

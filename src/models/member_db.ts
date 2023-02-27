@@ -49,6 +49,12 @@ export class MemberDBModel {
     return db('users')
       .where('id', id);
   }
+
+  getInfoFromCid(db: Knex, cid) {
+    return db('users')
+      .where('cid', cid);
+  }
+
   del(db: Knex, id) {
     return db('users')
       .where('id', id).del();
