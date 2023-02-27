@@ -80,7 +80,6 @@ router.put('/cid/:cid', async (req: Request, res: Response) => {
       const divisionId = req.body.divisionId;
 
       const tel = req.body.tel;
-      const cid = req.body.cid;
       const email = req.body.email;
       const note = req.body.note;
 
@@ -88,7 +87,6 @@ router.put('/cid/:cid', async (req: Request, res: Response) => {
       username ? objDB.username = username : null;
       tel ? objDB.tel = tel : null;
       note ? objDB.note = note : null;
-      cid ? objDB.cid = cid : null;
       email ? objDB.email = email : null;
       firstName ? objDB.first_name = firstName : null;
       lastName ? objDB.last_name = lastName : null;
