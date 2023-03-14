@@ -185,8 +185,8 @@ router.put('/active/:id', async (req: Request, res: Response) => {
 
 router.put('/cid/:cid', async (req: Request, res: Response) => {
   try {
-    const cid = req.params.cid;
-    if (cid) {
+    const cidParam = req.params.cid;
+    if (cidParam) {
       const username = req.body.username;
       const password = req.body.password;
       const firstName = req.body.firstName;
@@ -209,7 +209,7 @@ router.put('/cid/:cid', async (req: Request, res: Response) => {
       divisionId ? objDB.division_id = divisionId : null;
       password ? objDB.password = execSync('slappasswd -h "{MD5}" -s ' + req.body.password).toString() : null;
 
-      const info = await memberDBModel.getInfoFromCid(req.db, cid);
+      const info = await memberDBModel.getInfoFromCid(req.db, cidParam);
       if (info.length) {
         const objLdap: any = {};
         firstName ? objLdap.first_name = firstName : null;
